@@ -1,5 +1,5 @@
-$vpnName = $vpnName -replace ('e:','')
-$vpnName = "$vpnName VPN"
+$vpnName = "$clientName VPN" #-replace ('e:','')
+#$vpnName = "$vpnName VPN"
 $vpnPresent = Get-VpnConnection -AllUserConnection -Name $vpnName
 If (!$vpnPresent) {
     Write-Warning "!ERROR: $vpnName does not exist!"
