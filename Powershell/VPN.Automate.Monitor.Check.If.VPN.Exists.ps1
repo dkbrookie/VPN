@@ -2,7 +2,7 @@
 ## EDF located at the Client level.
 $vpnName = "$clientName VPN"
 ## See if the VPN connection already exists
-$vpnPresent = Get-VpnConnection -AllUserConnection -Name $vpnName
+$vpnPresent = Get-VpnConnection -AllUserConnection -Name $vpnName -EA 0
 If (!$vpnPresent) {
     Try {
         ## Create the VPN connection
@@ -10,9 +10,10 @@ If (!$vpnPresent) {
         ## the variablse being used here that were never defined in this script are passed in from Automate. It's
         ## taking values from EDFs and setting them as powershell variables before it calls this script. Because of
         ## this the script will fail if called standalone w/o the monitor.
+        Write-Output "$vpnName, $serverAddress, $tunnelType, $presharedKey, $authenticationMethod"
         Add-VpnConnection -Name $vpnName -ServerAddress $serverAddress -TunnelType $tunnelType -AllUserConnection -L2tpPsk $presharedKey -AuthenticationMethod $authenticationMethod -Force
         ## Check for the VPN connection again to see if it exists now
-        $vpnPresent = Get-VpnConnection -AllUserConnection -Name $vpnName
+        $vpnPresent = Get-VpnConnection -AllUserConnection -Name $vpnName -EA 0
         If ($vpnPresent) {
             Write-Output "!SUCCESS: Created $vpnName successfully"
             Break
