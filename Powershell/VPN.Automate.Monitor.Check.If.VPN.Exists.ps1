@@ -28,6 +28,8 @@ If (!$vpnPresent) {
 } Else {
     Try {
         Write-Output "!SUCCESS: Verified $vpnName exists"
+        ## Check the VPN connection properties. If the settings are different than the ones we are sending,
+        ## delete the VPN connection, then recreate it with the accurate settings.
         If (($vpnPresent).ServerAddress -ne $serverAddress -or ($vpnPresent).AuthenticationMethod -ne $authenticationMethod -or ($vpnPresent).TunnelType -ne $tunnelType) {
             Write-Warning "$vpnName has settings that do not match the configuration sent from Automate, recreating VPN connection..."
             Remove-VpnConnection -AllUserConnection -Name $vpnName -Force
@@ -35,6 +37,7 @@ If (!$vpnPresent) {
             Write-Output "!SUCCESS: Created $vpnName successfully"
         }
     } Catch {
+        ## If we're here then this means something went wrong when removing/creating the VPN connection above
         Write-Warning "!ERROR: Failed to created $vpnName"
     }
 }
