@@ -26,7 +26,15 @@ If (!$vpnPresent) {
         Break
     }
 } Else {
-    ## If the tunnel already exists the script goes straight to here and exits
-    Write-Output "!SUCCESS: Verified $vpnName exists"
-    Break
+    Try {
+        Write-Output "!SUCCESS: Verified $vpnName exists"
+        If (($vpnPresent).ServerAddress -ne $serverAddress -or ($vpnPresent).AuthenticationMethod -ne $authenticationMethod -or ($vpnPresent).TunnelType -ne $tunnelType) {
+            Write-Warning "$vpnName has settings that do not match the configuration sent from Automate, recreating VPN connection..."
+            Remove-VpnConnection -AllUserConnection -Name $vpnName -Force
+            Add-VpnConnection -Name $vpnName -ServerAddress $serverAddress -TunnelType $tunnelType -AllUserConnection -L2tpPsk $presharedKey -AuthenticationMethod $authenticationMethod -Force
+            Write-Output "!SUCCESS: Created $vpnName successfully"
+        }
+    } Catch {
+        Write-Warning "!ERROR: Failed to created $vpnName"
+    }
 }
