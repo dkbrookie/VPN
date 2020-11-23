@@ -22,7 +22,7 @@ If (!$vpnPresent) {
         }
     } Catch {
         ## If there was an error thrown during VPN connection creation it will come here and put out this error
-        Write-Warning "!ERROR: There was a problem when attempting to create $vpnName"
+        Write-Warning "!ERROR: There was a problem when attempting to create $vpnName. Error output: $error"
         Break
     }
 } Else {
@@ -38,6 +38,6 @@ If (!$vpnPresent) {
         }
     } Catch {
         ## If we're here then this means something went wrong when removing/creating the VPN connection above
-        Write-Warning "!ERROR: Failed to created $vpnName"
+        Write-Warning "!ERROR: Failed to created $vpnName. Error ourput: $error"
     }
 }
