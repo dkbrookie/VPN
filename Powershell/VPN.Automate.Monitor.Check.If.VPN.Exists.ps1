@@ -65,7 +65,6 @@ Function New-ClientVPN {
     }
 
 
-    # $SplitTunnel is passed in from the Automate monitor
     If ($SplitTunnel) {
         $vpnConfigHash = @{
             Name = $vpnName
@@ -74,7 +73,7 @@ Function New-ClientVPN {
             AllUserConnection = $AllUserConnection
             L2tpPsk = $PresharedKey
             AuthenticationMethod = $AuthenticationMethod
-            SplitTunnel = $SplitTunnel
+            SplitTunnel = $true
             Force = $true
         }
     } Else {
@@ -85,7 +84,6 @@ Function New-ClientVPN {
             AllUserConnection = $AllUserConnection
             L2tpPsk = $PresharedKey
             AuthenticationMethod = $AuthenticationMethod
-            SplitTunnel = $SplitTunnel
             Force = $true
         }
     }
