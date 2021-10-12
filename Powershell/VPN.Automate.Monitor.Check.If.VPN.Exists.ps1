@@ -53,7 +53,7 @@ Function New-ClientVPN {
     $output = @()
     $vpnName = "$clientName VPN"
     # Removing all non word characters from client name
-    $ClientName = $ClientName -replace '[\W]', ''
+    $ClientName = $ClientName -replace "[*&']"
 
 
     # Handling NULL or $false from Automate can be difficult so we're using 1/0 and translating to $true/$false
