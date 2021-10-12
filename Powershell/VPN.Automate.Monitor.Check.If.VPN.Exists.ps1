@@ -52,7 +52,7 @@ Function New-ClientVPN {
     # Define vars
     $output = @()
     # Removing all non word characters from client name
-    $ClientName = $ClientName -replace "[*&'/\;:,<>^$#%@!]", ''
+    $ClientName = $ClientName -replace "[^\w\s]", ''
     $vpnName = "$clientName VPN"
 
 
