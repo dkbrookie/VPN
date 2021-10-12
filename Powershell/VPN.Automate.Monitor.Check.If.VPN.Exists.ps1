@@ -114,6 +114,9 @@ Function New-ClientVPN {
 
 
     # Here we're creating different install hashes to splat later that define different install parameters
+    # I do believe that we could reduce this hash to one single entry but for some reason defining SplitTunnel 
+    # as $false instead of just not including it at all it errors out. Because of this, I have the separate
+    # hashes for now
     If ($SplitTunnel) {
         $vpnConfigHash = @{
             Name = $vpnName
