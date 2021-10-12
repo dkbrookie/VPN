@@ -34,6 +34,11 @@ Function New-ClientVPN {
         )]
         [ValidateSet(0,1)]
         [int32]$SplitTunnel = 0
+        ,[Parameter(
+            Mandatory = $false,
+            HelpMessage='help message'
+        )]
+        [string]$ClientName = 'Automated'
     )
 
 
@@ -46,15 +51,7 @@ Function New-ClientVPN {
 
     # Define vars
     $output = @()
-
-
-    # $clientName and $SplitTunnel are passed in from the Automate monitor. It pulls this value from the 
-    # ClientName and Split Tunnel EDFs located at the Client level.
-    If (!$clientName) {
-        $vpnName = 'Automated VPN'
-    } Else {
-        $vpnName = "$clientName VPN"
-    }
+    $vpnName = "$clientName VPN"
 
 
     # Handling NULL or $false from Automate can be difficult so we're using 1/0 and translating to $true/$false
