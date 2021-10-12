@@ -1,42 +1,88 @@
 Function New-ClientVPN {
+    <#
+    .Description
+    This function is designed to verify existence of a given VPN name, verify configuration, and create
+    or replace the VPN connection if the settings do not align with what was defined when this function
+    was called. For example, if split tunneling was set to enabled, but there is an existing VPN
+    connection on the machine with the same name you defined and split tunneling disabled, the existing
+    VPN connection would be removed, and a new one created with the apropriate settings.
+
+    .Parameter ServerAddress
+    Enter the server address you want the VPN connection to connect to.
+
+    .Parameter TunnelType
+    Choose the type of tunnel.
+
+    .Parameter AllUserConnection
+    Enabling this allows all users that can auth to the VPN to connect to VPN before Windows logon. 
+    This is helpful for when credentials for the user are not yet cached and the user is remote. Remember, 
+    the user must have credentials to authenticate the VPN-- the Preshared key alone will not authenticate
+    so this "all user" settings does not introduce additional security risk.
+
+    .Parameter PresharedKey
+    Enter the Preshared Key.
+
+    .Parameter AuthenticationMethod
+    Choose the Authentication Method.
+
+    .Parameter SplitTunnel
+    Setting this to 1 enables split tunneling which means only defined subnets defined on the VPN destination
+    route through VPN, while the remaining requests route straight from your original IP. This can be a
+    powerful way to increase performance on bandwidth constrained infrastructures, but can also have
+    unintentional consequences if an asset on the target end of the VPN live on a subnet not defined on the
+    target VPN side and the traffic from the endpoint goes straight to the internet instead of routing through 
+    the VPN. The result would be the appearance of a down system or broken application, when in fact the
+    users traffic is just simply not routing over the VPN tunnel. Note you can add additional routes from the
+    endpoint (https://community.spiceworks.com/how_to/75078-configuring-split-tunnel-client-vpn-on-windows) but
+    the right answer is to route from the VPN destination side since the endpoint side is reset after each
+    reboot.
+
+    .Parameter ClientName
+    Set this value to name your VPN connection. The name of the VPN will be [ClientName VPN] without the brackets. 
+    If this is left empty, the default is [Automated VPN].
+
+    .Example
+    C:\New-ClientVPN -ServerAddress 'something.meraki.com.yourconnection.etc' -TunnelType L2tp -AllUserConnection $true -PresharedKey 'uawjiuciewcnaiwiuua3n2in' -AuthenticationMethod Pap -SplitTunnel 1 -ClientName 'Example Company'
+    #>
+
 
     Param(
         [Parameter(
             Mandatory = $true,
-            HelpMessage='help message'
+            HelpMessage='Enter the server address you want the VPN connection to connect to.'
         )]
         [string]$ServerAddress
         ,[Parameter(
             Mandatory = $true,
-            HelpMessage='help message'
+            HelpMessage='Choose the type of tunnel.'
         )]
         [ValidateSet('Automatic','Ikev2','L2tp','Pptp','Sstp')]
         [string]$TunnelType
         ,[Parameter(
             Mandatory = $false,
-            HelpMessage='help message'
+            HelpMessage='Default this is [$true], but can be set to [$false]. Enabling this allows all users that can auth to the VPN to connect to VPN before Windows logon. This is helpful for when credentials for the user are not yet cached and the user is remote.'
         )]
         [boolean]$AllUserConnection = $true
         ,[Parameter(
             Mandatory = $true,
-            HelpMessage='help message'
+            HelpMessage='Enter the Preshared Key.'
         )]
         [string]$PresharedKey
         ,[Parameter(
             Mandatory = $true,
-            HelpMessage='help message'
+            HelpMessage='Choose the Authentication Method.'
         )]
         [ValidateSet('Chap','Eap','MachineCertificate','MSChapv2','Pap')]
         [string]$AuthenticationMethod
         ,[Parameter(
             Mandatory = $false,
-            HelpMessage='help message'
+            HelpMessage='Set this value to [0] or [1] without brackets. The value of [1] enables split tunneling which means only defined subnets on the VPN tunnel route through VPN, while the remaining requests route straight from your original IP.'
         )]
         [ValidateSet(0,1)]
         [int32]$SplitTunnel = 0
         ,[Parameter(
             Mandatory = $false,
-            HelpMessage='help message'
+            HelpMessage='Set this value to name your VPN connection. The name of the VPN will be [ClientName VPN] without the brackets. If this is left empty, the default is [Automated VPN].'
         )]
         [string]$ClientName = 'Automated'
     )
