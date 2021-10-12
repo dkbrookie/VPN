@@ -7,6 +7,9 @@ Function New-ClientVPN {
     connection on the machine with the same name you defined and split tunneling disabled, the existing
     VPN connection would be removed, and a new one created with the apropriate settings.
 
+    Note the !SUCCESS: and !FAILED: words in the function output are for easy identifiaction from
+    Automate to determine success or failure of the VPN creation.
+
     .Parameter ServerAddress
     Enter the server address you want the VPN connection to connect to.
 
@@ -110,6 +113,7 @@ Function New-ClientVPN {
     }
 
 
+    # Here we're creating different install hashes to splat later that define different install parameters
     If ($SplitTunnel) {
         $vpnConfigHash = @{
             Name = $vpnName
@@ -140,24 +144,22 @@ Function New-ClientVPN {
         Try {
             # Create the VPN connection
             $output += "$vpnName does not exist, creating connection..."
-            # the variablse being used here that were never defined in this script are passed in from Automate. It's
-            # taking values from EDFs and setting them as powershell variables before it calls this script. Because of
-            # this the script will fail if called standalone w/o the monitor.
+            # Splat the hash we made above that has the correct parameters based on used input
             Add-VpnConnection @vpnConfigHash
-            # Check for the VPN connection again to see if it exists now
+            # Check for the VPN connection again to see if it now exists
             $vpnPresent = Get-VpnConnection -AllUserConnection -Name $vpnName -EA 0
             If ($vpnPresent) {
                 $output += "!SUCCESS: Created $vpnName successfully"
                 Invoke-Output $output
                 Break
             } Else {
-                $output += "!ERROR: Failed to created $vpnName"
+                $output += "!FAILED: Failed to created $vpnName"
                 Invoke-Output $output
                 Break
             }
         } Catch {
             # If there was an error thrown during VPN connection creation it will come here and put out this error
-            $output += "!ERROR: There was a problem when attempting to create $vpnName. Error output: $error"
+            $output += "!FAILED: There was a problem when attempting to create $vpnName. Error output: $error"
             Invoke-Output $output
             Break
         }
@@ -178,7 +180,7 @@ Function New-ClientVPN {
             Break
         } Catch {
             # If we're here then this means something went wrong when removing/creating the VPN connection above
-            $output += "!ERROR: Failed to created $vpnName. Error ourput: $error"
+            $output += "!FAILED: Failed to created $vpnName. Error ourput: $error"
             Invoke-Output $output
             Break
         }
