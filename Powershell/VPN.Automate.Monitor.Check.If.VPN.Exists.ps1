@@ -105,39 +105,24 @@ Function New-ClientVPN {
     $vpnName = "$clientName VPN"
 
 
-    # Handling NULL or $false from Automate can be difficult so we're using 1/0 and translating to $true/$false
-    If ($SplitTunnel -eq 1) {
-        $SplitTunnel = $true
-    } Else {
-        $SplitTunnel = $false
+    # Handling NULL or $false from Automate can be difficult so we're using 1/0 and converting to boolean here.
+    # Since $SplitTunnel is a mandatory param we don't have to worry about a default value here.
+    Switch ($SplitTunnel) {
+        0 { [boolean]$SplitTunnel = $false }
+        1 { [boolean]$SplitTunnel = $true }
     }
 
 
-    # Here we're creating different install hashes to splat later that define different install parameters
-    # I do believe that we could reduce this hash to one single entry but for some reason defining SplitTunnel 
-    # as $false instead of just not including it at all it errors out. Because of this, I have the separate
-    # hashes for now
-    If ($SplitTunnel) {
-        $vpnConfigHash = @{
-            Name = $vpnName
-            ServerAddress = $ServerAddress
-            TunnelType = $TunnelType
-            AllUserConnection = $AllUserConnection
-            L2tpPsk = $PresharedKey
-            AuthenticationMethod = $AuthenticationMethod
-            SplitTunnel = $true
-            Force = $true
-        }
-    } Else {
-        $vpnConfigHash = @{
-            Name = $vpnName
-            ServerAddress = $ServerAddress
-            TunnelType = $TunnelType
-            AllUserConnection = $AllUserConnection
-            L2tpPsk = $PresharedKey
-            AuthenticationMethod = $AuthenticationMethod
-            Force = $true
-        }
+    # Create hash to splat for the VPN creation
+    $vpnConfigHash = @{
+        Name = $vpnName
+        ServerAddress = $ServerAddress
+        TunnelType = $TunnelType
+        AllUserConnection = $AllUserConnection
+        L2tpPsk = $PresharedKey
+        AuthenticationMethod = $AuthenticationMethod
+        SplitTunnel = $SplitTunnel
+        Force = $true
     }
 
 
